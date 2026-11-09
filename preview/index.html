@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Launch — Runway Board (Preview)</title>
+<style>
+  :root{
+    --bg:#0b0d10; --card:#12151a; --card2:#171b21; --border:#232830; --text:#e8eaed;
+    --muted:#9aa3ad; --accent:#f5c518; --green:#34c77b; --blue:#4f8ff7; --red:#e5534b;
+  }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;}
+  .banner{background:#2a2103;color:#ffd94d;border-bottom:1px solid #4a3a05;
+    padding:8px 16px;font-size:13px;text-align:center}
+  .banner b{color:#ffe27a}
+  header{padding:20px 24px 8px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+  .kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+  h1{margin:4px 0 2px;font-size:28px;letter-spacing:-.02em}
+  .sub{margin:0;color:var(--muted);font-size:14px}
+  .chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chip{border:1px solid var(--border);background:var(--card);border-radius:10px;
+    padding:8px 12px;font-size:13px;display:flex;gap:8px;align-items:center}
+  .chip b{font-variant-numeric:tabular-nums}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
+    border:1px solid var(--border);color:var(--muted);text-transform:capitalize}
+  .badge.locked{background:#3a2f04;border-color:#6b5510;color:#ffd94d}
+  .badge.approved{background:#0f2c1c;border-color:#1f5c3a;color:#5fd68f}
+  .badge.published{background:#12283f;border-color:#1f4a73;color:#7db4f8}
+  .meta{padding:0 24px;display:flex;gap:10px;align-items:center;color:var(--muted);font-size:12.5px;flex-wrap:wrap}
+  .runway{position:relative;padding:18px 24px 28px}
+  .runway:before{content:"";position:absolute;left:24px;right:24px;top:50%;height:1px;background:var(--border)}
+  .cards{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;position:relative}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    width:320px;flex:0 0 320px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .card.locked{border-color:#6b5510}
+  .card.published{border-color:#1f4a73}
+  .cardhead{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .chan{display:flex;gap:10px;align-items:center;min-width:0}
+  .icon{width:32px;height:32px;border-radius:9px;background:var(--card2);display:flex;
+    align-items:center;justify-content:center;font-size:15px;flex:0 0 32px}
+  .card h3{margin:0;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .when{margin:1px 0 0;font-size:12px;color:var(--muted)}
+  .copy{font-size:13.5px;line-height:1.5;white-space:pre-wrap;background:var(--card2);
+    border-radius:9px;padding:10px;min-height:150px;margin:0}
+  textarea.copy{width:100%;color:var(--text);border:1px solid var(--border);resize:none;
+    font-family:inherit;outline:none;min-height:150px}
+  .note{font-size:12px;color:var(--muted);border:1px dashed var(--border);border-radius:8px;padding:6px 8px}
+  .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:6px}
+  button{cursor:pointer;border:1px solid var(--border);background:var(--card2);color:var(--text);
+    border-radius:8px;padding:6px 10px;font-size:12.5px}
+  button:hover{border-color:#3a414c}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#191204;font-weight:600}
+  button.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+  button:disabled{opacity:.45;cursor:default}
+  .live{font-size:12px;color:var(--green)}
+  footer{padding:0 24px 26px;color:var(--muted);font-size:12.5px}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);
+    background:#1d222a;border:1px solid #333a45;color:var(--text);padding:10px 16px;border-radius:10px;
+    font-size:13.5px;max-width:min(92vw,560px);transition:transform .25s ease;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="banner">👀 <b>Interactive preview</b> — this is the real Launch board design with sample data, running in your browser only. The full app (AI agent + database + real publishing) is the Netlify deployment.</div>
+
+<header>
+  <div>
+    <p class="kicker">🚀 Launch runway</p>
+    <h1>Achilles</h1>
+    <p class="sub">The AI assistant that runs your launch day · for indie builders</p>
+  </div>
+  <div class="chips">
+    <div class="chip">⏳ <b id="countdown">T-…</b> <span style="color:var(--muted)">Tue, Nov 4 · 9:00 AM IST</span></div>
+    <div class="chip"><span id="ready">1/6 ready</span> · <span id="pubcount">1 published</span></div>
+  </div>
+</header>
+
+<div class="meta">
+  <span>🔒 Locked cards are final — the agent adapts everything else around them.</span>
+  <span>Try it: edit a draft, lock the X post, approve the LinkedIn post, then publish it.</span>
+</div>
+
+<div class="runway"><div class="cards" id="cards"></div></div>
+
+<footer>Launch — a launch-day war room where you and the AI agent edit the same board through the same actions. Built for the Builder.io Agent-Native Hackathon.</footer>
+
+<div id="toast" role="status"></div>
+
+<script>
+const LAUNCH_AT = new Date("2026-11-04T09:00:00+05:30").getTime();
+const assets = [
+  { id:"community", icon:"💬", channel:"Community", title:"Community teaser",
+    when:"1d before launch · Mon, Nov 3 · 6:00 PM", state:"draft",
+    text:"Tomorrow, we ship. 🚀\n\nFor the last few months we've been building Achilles — an AI assistant that runs your launch day so you don't have to juggle six tabs and a prayer.\n\nFull story tomorrow, 9 AM. Set a reminder." },
+  { id:"x", icon:"𝕏", channel:"X", title:"X launch post",
+    when:"At launch · Tue, Nov 4 · 9:00 AM", state:"locked",
+    text:"Today we launch Achilles — the AI assistant that runs your launch day. One board, every channel, nothing out of sync." },
+  { id:"ph", icon:"🏆", channel:"Product Hunt", title:"Product Hunt listing",
+    when:"5m after launch · Tue, Nov 4 · 9:05 AM", state:"draft",
+    text:"Achilles — Launch day, handled.\n\nOne board where you and an AI agent prepare, lock, and publish every launch post together. Lock your message once; Achilles keeps X, email, LinkedIn and Product Hunt in sync around it." },
+  { id:"email", icon:"✉️", channel:"Email", title:"Launch email",
+    when:"5m after launch · Tue, Nov 4 · 9:05 AM", state:"published",
+    text:"Subject: Achilles is live\n\nHi — Achilles, the AI assistant that runs your launch day, is live today." },
+  { id:"linkedin", icon:"in", channel:"LinkedIn", title:"LinkedIn post",
+    when:"15m after launch · Tue, Nov 4 · 9:15 AM", state:"draft",
+    text:"Launch days used to mean 6 open tabs, 4 versions of the same announcement, and one channel that got the old tagline.\n\nToday we're launching Achilles: one board where a founder and an AI agent prepare every launch asset together — you lock the message that matters, the agent keeps everything else in line.\n\nLive now. Link in comments." },
+  { id:"hn", icon:"📰", channel:"Hacker News", title:"Hacker News post",
+    when:"1h after launch · Tue, Nov 4 · 10:00 AM", state:"draft",
+    text:"Show HN: Achilles – a launch-day board where the agent and I edit the same posts\n\nI built Achilles because every launch I ran broke the same way: the announcement lived in six places, I edited one, and the rest quietly went stale. Achilles is one board of channel assets with a simple rule — the human locks what's final, the agent adapts the rest through the exact same actions the UI uses. Happy to answer questions about the architecture." },
+];
+
+const $cards = document.getElementById("cards");
+const $toast = document.getElementById("toast");
+let toastTimer;
+function toast(msg){ $toast.textContent = msg; $toast.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=> $toast.classList.remove("show"), 4200); }
+
+function refreshMeta(){
+  const ready = assets.filter(a=>a.state==="approved"||a.state==="published").length;
+  const pub = assets.filter(a=>a.state==="published").length;
+  document.getElementById("ready").textContent = ready + "/" + assets.length + " ready";
+  document.getElementById("pubcount").textContent = pub + " published";
+}
+
+function render(){
+  $cards.innerHTML = "";
+  assets.forEach(a=>{
+    const el = document.createElement("article");
+    el.className = "card" + (a.state==="locked"?" locked":"") + (a.state==="published"?" published":"");
+    const locked = a.state==="locked", published = a.state==="published";
+    el.innerHTML = `
+      <div class="cardhead">
+        <div class="chan"><div class="icon">${a.icon}</div>
+          <div><h3>${a.title}</h3><p class="when">${a.when}</p></div></div>
+        <span class="badge ${a.state}">${a.state}</span>
+      </div>
+      ${locked || published
+        ? `<p class="copy"></p>`
+        : `<textarea class="copy" data-edit="${a.id}"></textarea>`}
+      <div class="actions"></div>`;
+    const copyEl = el.querySelector(".copy");
+    if (copyEl) copyEl.textContent = a.text;
+    if (!locked && !published) copyEl.value = a.text;
+    const actions = el.querySelector(".actions");
+    const add = (label, cls, fn, primary)=>{
+      const b = document.createElement("button");
+      b.textContent = label; if(cls) b.className = cls; if(primary) b.classList.add("primary");
+      b.onclick = fn; actions.appendChild(b); return b;
+    };
+    if (!locked && !published){
+      add("💾 Save", "", ()=>{
+        a.text = el.querySelector("textarea").value;
+        toast("Saved. In the full app, your clicks and the agent call the same update action.");
+      });
+      add("🔒 Lock", "", ()=>{
+        a.text = el.querySelector("textarea").value; a.state = "locked"; render(); refreshMeta();
+        toast("Locked. Its text is now final — try editing it. The full app rejects text changes on locked cards, even from the agent.");
+      });
+    }
+    if (locked){
+      add("🔓 Unlock", "", ()=>{ a.state="draft"; render(); refreshMeta(); });
+      add("✨ Adapt the rest to this", "", ()=>{
+        toast("In the full app, the agent now rewrites every unlocked card to match this one — same message, each channel's own format.");
+      }, true);
+    }
+    if (!published && a.state !== "approved"){
+      add("✓ Approve", "ghost", ()=>{ a.state="approved"; render(); refreshMeta();
+        toast("Approved. Only approved cards can be published."); });
+    }
+    if (a.state === "approved"){
+      add("📤 Publish", "", ()=>{
+        if (confirm("Publish \"" + a.title + "\"? In the full app this step always needs a human's approval.")){
+          a.state = "published"; render(); refreshMeta();
+          toast("Published. 🎉 (Preview only — no real post was sent.)");
+        }
+      }, true);
+    }
+    if (published){
+      const s = document.createElement("span"); s.className = "live"; s.textContent = "✓ Live";
+      actions.appendChild(s);
+    }
+    $cards.appendChild(el);
+  });
+}
+
+function tick(){
+  const diff = LAUNCH_AT - Date.now();
+  const el = document.getElementById("countdown");
+  if (diff <= 0){ el.textContent = "Launched 🎉"; return; }
+  const d = Math.floor(diff/86400000), h = Math.floor(diff%86400000/3600000), m = Math.floor(diff%3600000/60000);
+  el.textContent = d>0 ? `T-${d}d ${h}h` : h>0 ? `T-${h}h ${m}m` : `T-${m}m`;
+}
+render(); refreshMeta(); tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>

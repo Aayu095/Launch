@@ -1,0 +1,18 @@
+[build]
+command = "export DATABASE_URL=\"${NETLIFY_DATABASE_URL:-$DATABASE_URL}\" && NITRO_PRESET=netlify pnpm build && if [ \"${CONTEXT:-}\" = \"production\" ]; then pnpm migrate:production; fi"
+publish = "dist"
+functions = ".netlify/functions-internal"
+
+[build.environment]
+GA_MEASUREMENT_ID = "G-ESF7FYXGN9"
+GTM_CONTAINER_ID = "GTM-N3WSTXZ"
+NITRO_PRESET = "netlify"
+NPM_CONFIG_PRODUCTION = "false"
+
+[context.production.environment]
+AGENT_NATIVE_HOSTED_HARNESS = "true"
+AGENT_NATIVE_DISABLE_KEEP_WARM_BACKGROUND = "1"
+BETTER_AUTH_TRUSTED_ORIGINS = "https://launch-runway.netlify.app"
+# Release migrations OFF for this site: it is deployed as a prebuilt bundle
+# via CLI, so no Netlify build step ever runs release migrations. Request
+# functions run schema ensures/migrations themselves (framework default).

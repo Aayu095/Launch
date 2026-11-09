@@ -1,0 +1,586 @@
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/jetbrains-mono";
+
+@import "tailwindcss";
+@import "@agent-native/toolkit/styles.css";
+
+@source "./**/*.{ts,tsx}";
+
+:root {
+  --background: 40 25% 99%;
+  --foreground: 30 8% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 30 8% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 30 8% 12%;
+  --primary: 30 8% 12%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 40 16% 96%;
+  --secondary-foreground: 30 8% 15%;
+  --muted: 40 16% 96%;
+  --muted-foreground: 30 6% 45%;
+  --accent: 40 16% 96%;
+  --accent-foreground: 30 8% 15%;
+  --destructive: 0 91% 71%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 40 12% 91%;
+  --input: 40 12% 91%;
+  --ring: 30 8% 40%;
+  --radius: 0.75rem;
+  --signal: 15 85% 55%;
+  --sidebar-background: 40 20% 98%;
+  --sidebar-foreground: 30 6% 45%;
+  --sidebar-primary: 30 8% 12%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 40 16% 94%;
+  --sidebar-accent-foreground: 30 8% 15%;
+  --sidebar-border: 40 12% 91%;
+  --sidebar-ring: 30 8% 40%;
+  --chat-sidebar-width: 17.5rem;
+  --chat-sidebar-content-inset: 0.5rem;
+  --chat-sidebar-row-padding: 0.75rem;
+  --chat-sidebar-title-fade: 1.25rem;
+}
+
+.chat-layout-shell {
+  --agent-layout-left-drawer-expanded-width: var(--chat-sidebar-width);
+  --agent-layout-left-drawer-collapsed-width: 3rem;
+  --agent-native-lower-surface: var(--agent-kit-nav-surface);
+}
+
+/* Phones get one app bar: the layout bar carries the thread title and
+   toolbar, so the AgentKit header would stack a second 48px bar. */
+@media (max-width: 47.99rem) {
+  [data-chat-header-in-app-bar="true"] .agentkit-chat-header {
+    display: none;
+  }
+}
+
+.agentkit-chat-empty-copy {
+  text-align: center;
+}
+
+.agentkit-chat-empty-copy h1 {
+  margin: 0;
+  color: hsl(var(--foreground));
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.agent-kit-chat-footer-stack {
+  /* Matches the transcript text lane (the lane minus its 1rem padding). */
+  inline-size: min(
+    100%,
+    calc(var(--agent-kit-conversation-max-width, 47rem) - 2rem)
+  );
+  margin-inline: auto;
+  pointer-events: auto;
+}
+
+.agent-kit-chat-footer-stack > .agentkit-composer-stack {
+  inline-size: 100%;
+}
+
+.agent-kit-chat-guided-question {
+  max-block-size: min(32rem, 58dvh);
+  overflow: auto;
+  margin-block-end: 0.5rem;
+  border: 1px solid var(--agentkit-border);
+  border-radius: var(--agentkit-radius);
+  background: var(--agentkit-surface);
+  box-shadow: var(--agentkit-elevation);
+}
+
+.chat-sidebar-history .an-chat-history__list {
+  padding-top: 0;
+}
+
+.chat-sidebar-history .an-chat-history__section-label {
+  padding: 8px
+    calc(var(--chat-sidebar-content-inset) + var(--chat-sidebar-row-padding))
+    5px;
+  color: hsl(var(--sidebar-foreground));
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.chat-sidebar-history.an-chat-history--rail .an-chat-history-row {
+  margin-inline: var(--chat-sidebar-content-inset);
+  border-radius: calc(var(--radius) + 2px);
+}
+
+.chat-sidebar-history.an-chat-history--rail .an-chat-history__skeleton-row {
+  min-height: 32px;
+  margin-inline: var(--chat-sidebar-content-inset);
+  padding-inline: var(--chat-sidebar-row-padding);
+}
+
+.chat-sidebar-history.an-chat-history--rail .an-chat-history-row__button {
+  min-height: 32px;
+  padding-block: 6px;
+  padding-inline: var(--chat-sidebar-row-padding);
+  color: hsl(var(--sidebar-foreground));
+}
+
+/* The ⋯ trigger sits 3px in from the row edge and is 24px wide, so it
+   reaches 15px into the title line past the row padding. */
+.chat-sidebar-history.an-chat-history--rail {
+  --an-chat-history-menu-clearance: calc(
+    1.6875rem - var(--chat-sidebar-row-padding)
+  );
+}
+
+/* Pinned rows hide their trigger until hover here, so they fade only then. */
+.chat-sidebar-history.an-chat-history--rail
+  .an-chat-history-row--pinned:not(
+    :hover,
+    :focus-within,
+    .an-chat-history-row--menu-open
+  )
+  .an-chat-history-row__topline {
+  mask-image: none;
+}
+
+.chat-sidebar-history .an-chat-history-row__title {
+  flex: 1 1 auto;
+  color: hsl(var(--sidebar-accent-foreground));
+  font-size: 13px;
+  font-weight: 400;
+  text-overflow: clip;
+}
+
+.chat-sidebar-thread-title-shell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-sidebar-thread-title {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.chat-sidebar-thread-running {
+  color: hsl(var(--sidebar-foreground) / 0.72);
+}
+
+.chat-sidebar-thread-title[data-overflow="true"] {
+  mask-image: linear-gradient(
+    to right,
+    hsl(var(--foreground)) 0,
+    hsl(var(--foreground)) calc(100% - var(--chat-sidebar-title-fade)),
+    hsl(var(--foreground) / 0) 100%
+  );
+}
+
+.chat-sidebar-thread-title__content {
+  display: block;
+  width: max-content;
+  transform: translateX(0);
+}
+
+.an-chat-history-row:hover
+  .chat-sidebar-thread-title[data-overflow="true"]
+  .chat-sidebar-thread-title__content {
+  animation: chat-sidebar-title-reveal
+    var(--chat-sidebar-title-duration, 1800ms) ease-in-out 350ms;
+}
+
+.chat-sidebar-history.an-chat-history--rail
+  .an-chat-history-row__menu-trigger--pinned {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.chat-sidebar-history.an-chat-history--rail
+  .an-chat-history-row:hover
+  .an-chat-history-row__menu-trigger--pinned,
+.chat-sidebar-history.an-chat-history--rail
+  .an-chat-history-row:focus-within
+  .an-chat-history-row__menu-trigger--pinned,
+.chat-sidebar-history.an-chat-history--rail
+  .an-chat-history-row__menu-trigger--pinned[aria-expanded="true"] {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+@keyframes chat-sidebar-title-reveal {
+  to {
+    transform: translateX(calc(-1 * var(--chat-sidebar-title-shift, 0px)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .an-chat-history-row:hover .chat-sidebar-thread-title__content {
+    animation: none;
+  }
+}
+
+.chat-sidebar-history.an-chat-history--rail
+  .an-chat-history-row--active
+  .an-chat-history-row__button {
+  background: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+}
+
+.dark {
+  --background: 0 0% 13%;
+  --foreground: 0 0% 90%;
+  --card: 0 0% 16.47%;
+  --card-foreground: 0 0% 90%;
+  --popover: 0 0% 15%;
+  --popover-foreground: 0 0% 90%;
+  --primary: 0 0% 75%;
+  --primary-foreground: 0 0% 10%;
+  --secondary: 0 0% 18%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 0 0% 18%;
+  --accent-foreground: 0 0% 90%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 24%;
+  --input: 0 0% 24%;
+  --ring: 0 0% 60%;
+  --radius: 0.5rem;
+  --sidebar-background: 0 0% 10%;
+  --sidebar-foreground: 0 0% 60%;
+  --sidebar-primary: 0 0% 75%;
+  --sidebar-primary-foreground: 0 0% 10%;
+  --sidebar-accent: 0 0% 16%;
+  --sidebar-accent-foreground: 0 0% 90%;
+  --sidebar-border: 0 0% 20%;
+  --sidebar-ring: 0 0% 60%;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter Variable", "Inter", sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Launch brand type + signal accent (domain pages: home intro + board).
+   Editorial system: Space Grotesk carries the big moments, a serif italic
+   carries the one emphasized word, Inter handles everything quiet. */
+.font-display {
+  font-family: "Space Grotesk Variable", "Inter Variable", sans-serif;
+  letter-spacing: -0.02em;
+}
+.font-accent {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.font-tech {
+  font-family: "Inter Variable", "Inter", sans-serif;
+  letter-spacing: 0.01em;
+}
+.text-signal {
+  color: hsl(var(--signal));
+}
+.bg-signal {
+  background-color: hsl(var(--signal));
+}
+.bg-signal-soft {
+  background-color: hsl(var(--signal) / 0.1);
+}
+.border-signal {
+  border-color: hsl(var(--signal));
+}
+
+/* Launch intro motion: scroll reveals, channel marquee, runway life.
+   Everything is transform/opacity only, and all of it stills under
+   prefers-reduced-motion. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+@keyframes launch-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: launch-marquee 58s linear infinite;
+}
+@keyframes launch-float {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -7px);
+  }
+}
+.animate-float-soft {
+  animation: launch-float 8s ease-in-out infinite;
+}
+@keyframes dawn-drift {
+  from {
+    transform: translate(-56%, 0) scale(1);
+  }
+  to {
+    transform: translate(-44%, -3%) scale(1.12);
+  }
+}
+.animate-dawn-drift {
+  animation: dawn-drift 16s ease-in-out infinite alternate;
+}
+@keyframes launch-pulse {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--signal) / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px hsl(var(--signal) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--signal) / 0);
+  }
+}
+.node-pulse {
+  animation: launch-pulse 2.4s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .marquee-track,
+  .animate-float-soft,
+  .animate-dawn-drift,
+  .node-pulse {
+    animation: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.22);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.34);
+}
+
+/* ── Sunrise system: dawn gradient for the line, glowing T−0 ── */
+.dawn-line {
+  background-image: linear-gradient(90deg, #ff4d00, #ff8a3d 55%, #ffc24d);
+}
+.dawn-text {
+  background-image: linear-gradient(94deg, #ff5a1f, #ff8a3d 55%, #ffc24d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dawn-zone {
+  background:
+    radial-gradient(62rem 30rem at 50% 82%, rgba(255, 77, 0, 0.3), transparent 62%),
+    radial-gradient(42rem 22rem at 88% -8%, rgba(255, 194, 77, 0.12), transparent 60%),
+    linear-gradient(180deg, #16141d 0%, #1a1214 58%, #231210 100%);
+}
+.dawn-zone-end {
+  background:
+    radial-gradient(58rem 28rem at 50% -10%, rgba(255, 77, 0, 0.26), transparent 60%),
+    linear-gradient(180deg, #1c1113 0%, #16141d 100%);
+}
+
+/* ── Engineering system: dot grids, glass arc, sandbox pulses ── */
+.dot-grid-dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+.dot-grid-light {
+  background-image: radial-gradient(rgba(20, 16, 12, 0.06) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+.glass-tile {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.38));
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 18px 40px rgba(255, 110, 40, 0.16),
+    0 4px 12px rgba(30, 20, 10, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+}
+.glass-tile-warm {
+  background: linear-gradient(135deg, rgba(255, 196, 150, 0.75), rgba(255, 150, 80, 0.28));
+  border-color: rgba(255, 190, 140, 0.8);
+}
+/* dark-glass variant: the arc, landed — for the footer bookend */
+.glass-tile-dark {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 6px 18px rgba(255, 110, 40, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+}
+.glass-tile-dark-warm {
+  background: linear-gradient(135deg, rgba(255, 150, 80, 0.3), rgba(255, 110, 40, 0.1));
+  border-color: rgba(255, 170, 110, 0.38);
+}
+
+/* ── Runway Glass: ONE surface system for the whole product ──
+   Every panel and card — website, dashboard, board — is one of these
+   two glasses on the paper canvas, with the same radius language. */
+.glass-panel {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.55));
+  border: 1px solid rgba(30, 22, 14, 0.09);
+  box-shadow:
+    0 14px 34px rgba(50, 30, 10, 0.07),
+    0 2px 8px rgba(50, 30, 10, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+}
+.glass-panel-dark {
+  background: linear-gradient(150deg, rgba(26, 23, 30, 0.94), rgba(11, 10, 13, 0.97));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 24px 60px rgba(20, 10, 5, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+/* Dark theme (system default on many machines): the light glass flips to
+   dark glass. Without this, board/dashboard cards stayed pale in dark mode
+   while their token-colored text turned near-white — titles vanished. */
+.dark .glass-panel {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+/* The website follows the system theme like the rest of the product
+   (Aashi, 2026-11-05: dark system → the home page must open dark). Its
+   designed sections use theme tokens / dark: variants; the hero's glass
+   arc tiles get their dark glass here, mirroring the footer's dark tiles. */
+.dark .glass-tile {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 6px 18px rgba(255, 110, 40, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.dark .glass-tile-warm {
+  background: linear-gradient(135deg, rgba(255, 150, 80, 0.3), rgba(255, 110, 40, 0.1));
+  border-color: rgba(255, 170, 110, 0.38);
+}
+@keyframes arc-flow-a {
+  from {
+    transform: translateX(-2.5%);
+  }
+  to {
+    transform: translateX(2.5%);
+  }
+}
+@keyframes arc-flow-b {
+  from {
+    transform: translateX(2%);
+  }
+  to {
+    transform: translateX(-2%);
+  }
+}
+.animate-arc-a {
+  animation: arc-flow-a 16s ease-in-out infinite alternate;
+}
+.animate-arc-b {
+  animation: arc-flow-b 20s ease-in-out infinite alternate;
+}
+@keyframes beam-grow-r {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  55% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+.beam-r {
+  transform-origin: left center;
+  animation: beam-grow-r 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.beam-l {
+  transform-origin: right center;
+  animation: beam-grow-r 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes card-hit-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 26, 0);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  35% {
+    box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.28);
+    border-color: rgba(255, 150, 60, 0.75);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 26, 0);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+.card-hit {
+  animation: card-hit-flash 0.9s ease-out both;
+}
+@keyframes sm-cycle {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  12%,
+  30% {
+    opacity: 1;
+  }
+}
+.sm-node {
+  animation: sm-cycle 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-arc-a,
+  .animate-arc-b,
+  .beam-r,
+  .beam-l,
+  .card-hit,
+  .sm-node {
+    animation: none;
+  }
+}
